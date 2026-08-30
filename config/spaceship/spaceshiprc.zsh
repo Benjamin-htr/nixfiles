@@ -1,0 +1,72 @@
+# Display time
+SPACESHIP_TIME_SHOW=true
+
+# Battery display
+SPACESHIP_BATTERY_SHOW=true
+SPACESHIP_BATTERY_THRESHOLD=40
+
+SPACESHIP_PROMPT_ORDER=(
+  user
+  dir
+  host
+  git
+  hg
+  package
+  node
+  bun
+  deno
+  ruby
+  python
+  elm
+  elixir
+  xcode
+  xcenv
+  swift
+  swiftenv
+  golang
+  perl
+  php
+  rust
+  haskell
+  scala
+  kotlin
+  java
+  lua
+  dart
+  julia
+  crystal
+  docker
+  docker_compose
+  aws
+  gcloud
+  azure
+  venv
+  conda
+  uv
+  dotnet
+  ocaml
+  vlang
+  zig
+  purescript
+  erlang
+  gleam
+  kubectl
+  ansible
+  terraform
+  pulumi
+  ibmcloud
+  nix_shell
+  gnu_screen
+  exec_time
+  async
+  line_sep
+  jobs
+  exit_code
+  sudo
+  char
+)
+
+SPACESHIP_RPROMPT_ORDER=(
+  time
+  battery
+)

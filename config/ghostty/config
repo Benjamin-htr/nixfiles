@@ -1,0 +1,4 @@
+font-family = Berkeley Mono
+theme = dark:Flexoki Dark,light:Flexoki Light
+
+shell-integration-features = ssh-env
