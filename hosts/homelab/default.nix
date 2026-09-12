@@ -12,6 +12,7 @@
     ../../modules/nixos/server.nix
     ../../modules/nixos/containers.nix
     ../../modules/nixos/services/home-assistant.nix
+    ../../modules/nixos/services/grimmory.nix
   ];
 
   nixpkgs.hostPlatform = "x86_64-linux";
@@ -19,6 +20,8 @@
 
   users.users.${username} = {
     isNormalUser = true;
+    # Keep the UID stable because container volume permissions use it.
+    uid = 1000;
     description = "Benjamin";
     extraGroups = [ "wheel" ];
     shell = pkgs.zsh;

@@ -7,8 +7,8 @@ Configuration personnelle pour deux machines :
 - `homelab` : Firebat MN56 en NixOS `x86_64-linux`, serveur sans interface
   graphique.
 
-Le système de base, le moteur de conteneurs Docker et Home Assistant sont
-configurés. Pangolin/Newt, Grimmory et Paperless-ngx seront ajoutés
+Le système de base, le moteur de conteneurs Docker, Home Assistant et la stack
+Grimmory sont configurés. Pangolin/Newt et Paperless-ngx seront ajoutés
 progressivement.
 
 ## Organisation
@@ -186,6 +186,44 @@ ssh -L 8123:127.0.0.1:8123 benjamin@ADRESSE_IP_DU_HOMELAB
 Ouvrir ensuite <http://localhost:8123> pour terminer l'assistant de première
 configuration. Le tunnel SSH est temporaire ; Pangolin/Newt fournira ensuite
 l'accès permanent sans ouvrir de port entrant sur le routeur.
+
+### Grimmory
+
+Grimmory est déployé avec MariaDB dans une stack séparée. L'image Grimmory est
+épinglée en `v3.3.3`, les données sont conservées dans
+`/srv/containers/grimmory` et l'application écoute uniquement sur
+`127.0.0.1:6060`.
+
+Après la reconstruction NixOS, préparer le fichier de secrets sur le serveur :
+
+```bash
+sudo cp /etc/homelab/grimmory/grimmory.env.example \
+  /var/lib/homelab/grimmory/grimmory.env
+sudoedit /var/lib/homelab/grimmory/grimmory.env
+sudo chmod 600 /var/lib/homelab/grimmory/grimmory.env
+sudo systemctl start compose-grimmory
+```
+
+Remplacer les deux valeurs `CHANGE_ME` par des mots de passe longs et uniques.
+Vérifier ensuite :
+
+```bash
+systemctl status compose-grimmory --no-pager
+docker compose --env-file /var/lib/homelab/grimmory/grimmory.env \
+  --file /etc/homelab/grimmory/compose.yaml ps
+docker compose --env-file /var/lib/homelab/grimmory/grimmory.env \
+  --file /etc/homelab/grimmory/compose.yaml logs --tail 100
+```
+
+Depuis le Mac, utiliser un second tunnel SSH :
+
+```bash
+ssh -N -L 6060:127.0.0.1:6060 benjamin@192.168.64.3
+```
+
+Ouvrir ensuite <http://localhost:6060>. La documentation officielle de Grimmory
+décrit les répertoires `data`, `books`, `bookdrop` et MariaDB utilisés par cette
+stack.
 
 ## Utilisation courante
 

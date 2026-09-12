@@ -1,0 +1,55 @@
+name: grimmory
+
+services:
+  grimmory:
+    # Pin the image so upgrades happen through a reviewed Git change.
+    image: ghcr.io/grimmory-tools/grimmory:v3.3.3
+    container_name: grimmory
+    restart: unless-stopped
+
+    environment:
+      USER_ID: "${APP_USER_ID}"
+      GROUP_ID: "${APP_GROUP_ID}"
+      TZ: "${TZ}"
+      DATABASE_URL: "${DATABASE_URL}"
+      DATABASE_USERNAME: "${DB_USER}"
+      DATABASE_PASSWORD: "${DB_PASSWORD}"
+      SERVER_PORT: "${SERVER_PORT}"
+
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+    # Bind only to loopback for now. Access is through an SSH tunnel until
+    # Pangolin/Newt is configured.
+    ports:
+      - "127.0.0.1:${SERVER_PORT}:${SERVER_PORT}"
+
+    volumes:
+      - /srv/containers/grimmory/data:/app/data
+      - /srv/containers/grimmory/books:/books
+      - /srv/containers/grimmory/bookdrop:/bookdrop
+
+  mariadb:
+    image: lscr.io/linuxserver/mariadb:11.4.5
+    container_name: grimmory-mariadb
+    restart: unless-stopped
+
+    environment:
+      PUID: "${DB_USER_ID}"
+      PGID: "${DB_GROUP_ID}"
+      TZ: "${TZ}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${DB_USER}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
+
+    volumes:
+      - /srv/containers/grimmory/mariadb/config:/config
+
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
