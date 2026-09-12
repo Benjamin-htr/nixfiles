@@ -24,20 +24,14 @@
     casks = [
       "arc"
       "bitwarden"
-      "cmdcmd"
-      "copilot-cli"
       "discord"
       "ghostty"
-      "godot"
       "keka"
       "logi-options+"
       "megasync"
       "orbstack"
-      "proton-mail"
-      "qobuz"
       "qwerty-fr"
       "raycast"
-      "updf"
       "zed"
     ];
   };

@@ -98,6 +98,9 @@ mise list
 Berkeley Mono reste une installation manuelle depuis la copie licenciée de la
 police. Bitwarden, Logi Options+, QWERTY-fr et certaines autres applications
 peuvent également demander des permissions macOS lors du premier lancement.
+Après la première activation, redémarrer macOS pour charger QWERTY-fr. Il sera
+ensuite sélectionné automatiquement. Raycast démarre à l'ouverture de session
+et utilise `Cmd + Espace`, à la place du raccourci Spotlight correspondant.
 
 Les anciennes formules Homebrew `git`, `gh`, `just`, `mise` et `duti` ne sont
 pas supprimées automatiquement pendant cette première
