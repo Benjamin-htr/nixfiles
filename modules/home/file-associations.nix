@@ -7,6 +7,8 @@ let
   editorBundleId = "dev.zed.Zed";
 in
 {
+  # duti updates Launch Services after Home Manager has created the user files.
+  # DRY_RUN_CMD prevents changes during a Home Manager dry run.
   home.activation.defaultEditorAssociations = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     for type in \
       public.plain-text \

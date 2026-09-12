@@ -23,23 +23,44 @@ let
   escapedUsername = lib.escapeShellArg username;
 in
 {
-  system.defaults.CustomUserPreferences = {
-    "com.apple.HIToolbox" = {
-      AppleCurrentKeyboardLayoutInputSourceID =
-        "com.apple.keyboardlayout.qwerty-fr.keylayout.qwerty-fr";
-      AppleEnabledInputSources = [
-        qwertyFr
-        characterPalette
-        pressAndHold
-      ];
-      AppleInputSourceHistory = [ qwertyFr ];
-      AppleSelectedInputSources = [
-        qwertyFr
-        pressAndHold
-      ];
-    };
+  system.defaults = {
+    # Mouse settings matching the preferred System Settings slider positions.
+    # The speed keys require raw macOS defaults because nix-darwin does not
+    # expose dedicated typed options for them.
+    NSGlobalDomain."com.apple.swipescrolldirection" = true;
 
-    "com.raycast.macos".raycastGlobalHotkey = "Command-49";
+    CustomUserPreferences = {
+      NSGlobalDomain = {
+        "com.apple.mouse.scaling" = 0.5;
+        "com.apple.mouse.doubleClickThreshold" = 0.5;
+        "com.apple.scrollwheel.scaling" = 0.3125;
+      };
+
+      # Enable right-side secondary click in both the user and Bluetooth Magic
+      # Mouse preference domains.
+      "com.apple.AppleMultitouchMouse".MouseButtonMode = "TwoButton";
+      "com.apple.driver.AppleBluetoothMultitouch.mouse".MouseButtonMode = "TwoButton";
+
+      # Make qwerty-fr the primary input source without removing the macOS
+      # character palette and press-and-hold input methods.
+      "com.apple.HIToolbox" = {
+        AppleCurrentKeyboardLayoutInputSourceID =
+          "com.apple.keyboardlayout.qwerty-fr.keylayout.qwerty-fr";
+        AppleEnabledInputSources = [
+          qwertyFr
+          characterPalette
+          pressAndHold
+        ];
+        AppleInputSourceHistory = [ qwertyFr ];
+        AppleSelectedInputSources = [
+          qwertyFr
+          pressAndHold
+        ];
+      };
+
+      # Key code 49 is the space bar, so this assigns Cmd-Space to Raycast.
+      "com.raycast.macos".raycastGlobalHotkey = "Command-49";
+    };
   };
 
   # Keep all other macOS shortcuts intact while freeing Cmd-Space for Raycast.

@@ -1,5 +1,7 @@
 { username, ... }:
 {
+  # nix-homebrew owns the Homebrew installation itself; nix-darwin manages the
+  # formulae and casks declared below.
   nix-homebrew = {
     enable = true;
     enableRosetta = false;
@@ -21,6 +23,8 @@
 
     brews = [ "thefuck" ];
 
+    # GUI applications that are unavailable or better maintained as Homebrew
+    # casks rather than Nix packages on macOS.
     casks = [
       "arc"
       "bitwarden"

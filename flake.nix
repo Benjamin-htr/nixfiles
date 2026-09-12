@@ -2,6 +2,8 @@
   description = "Benjamin's macOS and homelab configuration";
 
   inputs = {
+    # Use platform-specific nixpkgs branches while keeping both systems on the
+    # same NixOS release cycle.
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-darwin.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
 
@@ -29,6 +31,7 @@
       ...
     }:
     let
+      # Shared by the host modules to avoid repeating the account name.
       username = "benjamin";
     in
     {
@@ -50,6 +53,8 @@
         ];
       };
 
+      # Evaluate both complete systems with `nix flake check` without applying
+      # either configuration.
       checks = {
         aarch64-darwin.macbook-benjamin = self.darwinConfigurations.macbook-benjamin.system;
         x86_64-linux.homelab = self.nixosConfigurations.homelab.config.system.build.toplevel;

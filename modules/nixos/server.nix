@@ -1,5 +1,7 @@
 { pkgs, ... }:
 {
+  # Boot directly through UEFI and retain a small number of generations in the
+  # boot menu for recovery.
   boot = {
     loader = {
       efi.canTouchEfiVariables = true;
@@ -15,6 +17,8 @@
 
   networking = {
     networkmanager.enable = true;
+    # The server is administered over SSH; application traffic will later pass
+    # through the tunnel instead of opening additional router-facing ports.
     firewall = {
       enable = true;
       allowedTCPPorts = [ 22 ];
@@ -33,6 +37,7 @@
       auto-optimise-store = true;
     };
 
+    # Bound the Nix store growth while retaining recent rollback generations.
     gc = {
       automatic = true;
       dates = "weekly";
