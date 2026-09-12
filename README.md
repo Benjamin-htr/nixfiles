@@ -7,8 +7,9 @@ Configuration personnelle pour deux machines :
 - `homelab` : Firebat MN56 en NixOS `x86_64-linux`, serveur sans interface
   graphique.
 
-Le premier jalon couvre uniquement le système de base. Pangolin/Newt,
-Grimmory, Paperless-ngx et Home Assistant seront ajoutés dans un second temps.
+Le système de base et le moteur de conteneurs Docker sont configurés.
+Pangolin/Newt, Grimmory, Paperless-ngx et Home Assistant seront ajoutés
+progressivement.
 
 ## Organisation
 
@@ -21,7 +22,7 @@ Grimmory, Paperless-ngx et Home Assistant seront ajoutés dans un second temps.
 ├── modules/
 │   ├── home/       # configuration de l'utilisateur, partagée si utile
 │   ├── darwin/     # système macOS et Homebrew
-│   └── nixos/      # système NixOS du serveur
+│   └── nixos/      # système NixOS et moteur de conteneurs du serveur
 └── config/         # fichiers de configuration déployés par Home Manager
 ```
 
@@ -135,6 +136,29 @@ Le serveur utilise Ethernet et DHCP. Il autorise temporairement SSH par mot de
 passe uniquement sur le réseau local. Avant toute exposition supplémentaire,
 ajouter la clé publique Bitwarden dans `users.users.benjamin.openssh.authorizedKeys`
 et passer `PasswordAuthentication` à `false`.
+
+### Conteneurs
+
+NixOS installe Docker avec le plugin Compose, démarre le démon au boot et crée
+`/srv/containers` pour les fichiers Compose et les données persistantes. Le
+compte `benjamin` appartient au groupe `docker` ; cet accès est équivalent à un
+accès root et doit rester réservé au compte administrateur.
+
+Après la première activation, fermer puis rouvrir la session SSH afin de
+charger le nouveau groupe, puis vérifier le socle :
+
+```bash
+systemctl is-active docker
+docker version
+docker compose version
+ls -ld /srv/containers
+docker run --rm hello-world
+```
+
+Le nettoyage hebdomadaire ne concerne que les ressources Docker inutilisées
+depuis plus de sept jours. Les volumes ne sont jamais supprimés automatiquement.
+Les futures applications utiliseront des réseaux Docker privés et ne publieront
+pas de ports sur toutes les interfaces sans décision explicite.
 
 ## Utilisation courante
 

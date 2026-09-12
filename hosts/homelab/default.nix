@@ -10,6 +10,7 @@
   imports = [
     ./hardware-configuration.nix
     ../../modules/nixos/server.nix
+    ../../modules/nixos/containers.nix
   ];
 
   nixpkgs.hostPlatform = "x86_64-linux";
