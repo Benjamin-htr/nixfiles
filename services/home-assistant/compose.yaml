@@ -1,0 +1,24 @@
+name: home-assistant
+
+services:
+  home-assistant:
+    # Pin the image so a rebuild cannot silently install a newer release.
+    image: ghcr.io/home-assistant/home-assistant:2026.9.2
+    container_name: home-assistant
+    restart: unless-stopped
+
+    # Home Assistant uses host networking for local device discovery. The
+    # NixOS firewall still prevents direct access from the LAN to port 8123.
+    network_mode: host
+    privileged: true
+
+    environment:
+      TZ: Europe/Paris
+
+    volumes:
+      - /srv/containers/home-assistant/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      # This enables Bluetooth discovery when the host exposes a controller.
+      - /run/dbus:/run/dbus:ro
+
+    stop_grace_period: 60s

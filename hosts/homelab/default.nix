@@ -11,6 +11,7 @@
     ./hardware-configuration.nix
     ../../modules/nixos/server.nix
     ../../modules/nixos/containers.nix
+    ../../modules/nixos/services/home-assistant.nix
   ];
 
   nixpkgs.hostPlatform = "x86_64-linux";

@@ -7,8 +7,8 @@ Configuration personnelle pour deux machines :
 - `homelab` : Firebat MN56 en NixOS `x86_64-linux`, serveur sans interface
   graphique.
 
-Le système de base et le moteur de conteneurs Docker sont configurés.
-Pangolin/Newt, Grimmory, Paperless-ngx et Home Assistant seront ajoutés
+Le système de base, le moteur de conteneurs Docker et Home Assistant sont
+configurés. Pangolin/Newt, Grimmory et Paperless-ngx seront ajoutés
 progressivement.
 
 ## Organisation
@@ -23,6 +23,7 @@ progressivement.
 │   ├── home/       # configuration de l'utilisateur, partagée si utile
 │   ├── darwin/     # système macOS et Homebrew
 │   └── nixos/      # système NixOS et moteur de conteneurs du serveur
+├── services/       # définitions Compose versionnées des applications
 └── config/         # fichiers de configuration déployés par Home Manager
 ```
 
@@ -159,6 +160,32 @@ Le nettoyage hebdomadaire ne concerne que les ressources Docker inutilisées
 depuis plus de sept jours. Les volumes ne sont jamais supprimés automatiquement.
 Les futures applications utiliseront des réseaux Docker privés et ne publieront
 pas de ports sur toutes les interfaces sans décision explicite.
+
+### Home Assistant
+
+Home Assistant Container est démarré automatiquement par systemd. Son image est
+épinglée et sa configuration persistante se trouve dans
+`/srv/containers/home-assistant/config`. Le port `8123` n'est pas ouvert dans le
+pare-feu NixOS.
+
+Après avoir récupéré les changements et reconstruit le serveur :
+
+```bash
+sudo nixos-rebuild switch --flake .#homelab
+systemctl status compose-home-assistant --no-pager
+docker compose --file /etc/homelab/home-assistant/compose.yaml ps
+docker compose --file /etc/homelab/home-assistant/compose.yaml logs --tail 100
+```
+
+Depuis le Mac, créer un tunnel SSH en laissant cette commande ouverte :
+
+```bash
+ssh -L 8123:127.0.0.1:8123 benjamin@ADRESSE_IP_DU_HOMELAB
+```
+
+Ouvrir ensuite <http://localhost:8123> pour terminer l'assistant de première
+configuration. Le tunnel SSH est temporaire ; Pangolin/Newt fournira ensuite
+l'accès permanent sans ouvrir de port entrant sur le routeur.
 
 ## Utilisation courante
 
