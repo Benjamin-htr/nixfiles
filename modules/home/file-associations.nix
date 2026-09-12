@@ -12,7 +12,6 @@ in
   home.activation.defaultEditorAssociations = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     for type in \
       public.plain-text \
-      public.data \
       public.text \
       public.source-code \
       public.unix-shell-script \
