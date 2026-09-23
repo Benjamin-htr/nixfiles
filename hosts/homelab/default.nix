@@ -25,6 +25,9 @@
     description = "Benjamin";
     extraGroups = [ "wheel" ];
     shell = pkgs.zsh;
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGI6aBQUhTq1cSKORYhg6nsiTqzLtCZxwP2SjRs2o7Va"
+    ];
   };
 
   home-manager = {
