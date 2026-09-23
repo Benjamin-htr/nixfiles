@@ -57,9 +57,7 @@
     openFirewall = false;
     settings = {
       PermitRootLogin = "no";
-      # Temporary bootstrap setting. Replace it with an authorized public key
-      # and set this to false before exposing SSH beyond the trusted LAN.
-      PasswordAuthentication = true;
+      PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
     };
   };
