@@ -7,9 +7,8 @@ Configuration personnelle pour deux machines :
 - `homelab` : Firebat MN56 en NixOS `x86_64-linux`, serveur sans interface
   graphique.
 
-Le système de base, le moteur de conteneurs Docker, Home Assistant et la stack
-Grimmory sont configurés. Pangolin/Newt et Paperless-ngx seront ajoutés
-progressivement.
+Le système de base, le moteur de conteneurs Docker, Home Assistant, Grimmory et
+Paperless-ngx sont configurés. Pangolin/Newt sera ajouté progressivement.
 
 ## Organisation
 
@@ -133,10 +132,9 @@ sudo nixos-install --flake /mnt/etc/nixos#homelab
 sudo nixos-enter --root /mnt -c 'passwd benjamin'
 ```
 
-Le serveur utilise Ethernet et DHCP. Il autorise temporairement SSH par mot de
-passe uniquement sur le réseau local. Avant toute exposition supplémentaire,
-ajouter la clé publique Bitwarden dans `users.users.benjamin.openssh.authorizedKeys`
-et passer `PasswordAuthentication` à `false`.
+Le serveur utilise Ethernet et DHCP, avec un bail réservé sur la Freebox pour
+`192.168.1.82`. SSH utilise la clé publique Bitwarden du compte `benjamin` ;
+l'authentification par mot de passe est désactivée.
 
 ### Conteneurs
 
@@ -218,12 +216,53 @@ docker compose --env-file /var/lib/homelab/grimmory/grimmory.env \
 Depuis le Mac, utiliser un second tunnel SSH :
 
 ```bash
-ssh -N -L 6060:127.0.0.1:6060 benjamin@192.168.64.3
+ssh -N -L 6060:127.0.0.1:6060 benjamin@192.168.1.82
 ```
 
 Ouvrir ensuite <http://localhost:6060>. La documentation officielle de Grimmory
 décrit les répertoires `data`, `books`, `bookdrop` et MariaDB utilisés par cette
 stack.
+
+### Paperless-ngx
+
+Paperless-ngx est déployé avec PostgreSQL et Valkey dans une stack séparée.
+L'image applicative est épinglée en `3.2.1`. Les documents, la base de données
+et les autres données persistantes se trouvent sous `/srv/containers/paperless`.
+L'OCR utilise le français et l'anglais. L'interface écoute uniquement sur
+`127.0.0.1:8000` ; aucun port supplémentaire n'est ouvert dans le pare-feu.
+
+Après avoir récupéré les changements et reconstruit NixOS, créer les trois
+secrets sur le serveur. Remplacer **entièrement** chaque valeur `CHANGE_ME` par
+un mot de passe ou une clé longue et unique ; conserver ces valeurs hors du
+dépôt :
+
+```bash
+sudo cp /etc/homelab/paperless/paperless.env.example \
+  /var/lib/homelab/paperless/paperless.env
+sudoedit /var/lib/homelab/paperless/paperless.env
+sudo chmod 600 /var/lib/homelab/paperless/paperless.env
+sudo systemctl start compose-paperless
+```
+
+Vérifier le service et les trois conteneurs :
+
+```bash
+systemctl status compose-paperless --no-pager
+docker ps --filter name=paperless
+```
+
+Depuis le Mac, laisser le tunnel ouvert et accéder à <http://localhost:8000> :
+
+```bash
+ssh -N -L 8000:127.0.0.1:8000 benjamin@192.168.1.82
+```
+
+Le compte initial est `benjamin`, avec le mot de passe défini dans
+`PAPERLESS_ADMIN_PASSWORD`. Le répertoire `consume` permet ensuite l'import
+automatique des documents. Les données PostgreSQL et Valkey sont aussi sous
+`/srv/containers/paperless` : elles doivent être incluses dans les sauvegardes.
+Lors de l'ajout d'un accès permanent via Pangolin, définir `PAPERLESS_URL` sur
+l'URL HTTPS retenue avant d'utiliser cet accès.
 
 ## Utilisation courante
 

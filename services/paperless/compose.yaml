@@ -1,0 +1,62 @@
+name: paperless
+
+services:
+  broker:
+    image: docker.io/valkey/valkey:9-alpine
+    container_name: paperless-valkey
+    restart: unless-stopped
+    volumes:
+      - /srv/containers/paperless/valkey:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db:
+    image: docker.io/library/postgres:18
+    container_name: paperless-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+    volumes:
+      - /srv/containers/paperless/postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paperless -d paperless"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:3.2.1
+    container_name: paperless-ngx
+    restart: unless-stopped
+    depends_on:
+      broker:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - /srv/containers/paperless/data:/usr/src/paperless/data
+      - /srv/containers/paperless/media:/usr/src/paperless/media
+      - /srv/containers/paperless/export:/usr/src/paperless/export
+      - /srv/containers/paperless/consume:/usr/src/paperless/consume
+    environment:
+      USERMAP_UID: "1000"
+      USERMAP_GID: "100"
+      PAPERLESS_TIME_ZONE: Europe/Paris
+      PAPERLESS_OCR_LANGUAGE: fra+eng
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBHOST: db
+      PAPERLESS_DBNAME: paperless
+      PAPERLESS_DBUSER: paperless
+      PAPERLESS_DBPASS: "${POSTGRES_PASSWORD}"
+      PAPERLESS_SECRET_KEY: "${PAPERLESS_SECRET_KEY}"
+      PAPERLESS_ADMIN_USER: benjamin
+      PAPERLESS_ADMIN_PASSWORD: "${PAPERLESS_ADMIN_PASSWORD}"

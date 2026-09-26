@@ -13,6 +13,7 @@
     ../../modules/nixos/containers.nix
     ../../modules/nixos/services/home-assistant.nix
     ../../modules/nixos/services/grimmory.nix
+    ../../modules/nixos/services/paperless.nix
   ];
 
   nixpkgs.hostPlatform = "x86_64-linux";
